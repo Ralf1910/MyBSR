@@ -30,6 +30,9 @@ class BSR extends IPSModule {
 		$this->MaintainVariable("BSRAbholungAnzeige", "BSR Abholung Anzeige", 3, "", 20, true);
 		$this->MaintainVariable("GruenerPunktNextDate", "Grüner Punkt nächster Abholtermin", 1, "~UnixTimestampDate", 30, true);
 		$this->MaintainVariable("GruenerPunktAbholungAnzeige", "Grüner Punkt Abholung Anzeige", 3, "", 40, true);
+		$this->MaintainVariable("AltpapierNextDate", "Altpapier nächster Abholtermin", 1, "~UnixTimestampDate", 50, true);
+		$this->MaintainVariable("AltpapierAbholungAnzeige", "Altpapier Abholung Anzeige", 3, "", 60, true);
+		
 
 		$this->UpdateAbholtermine();
 
@@ -55,6 +58,9 @@ class BSR extends IPSModule {
 					        "11.07.2019", "25.07.2019", "08.08.2019", "22.08.2019", "05.09.2019", "19.09.2019", "04.10.2019", "17.10.2019", "31.10.2019", "14.11.2019", "28.11.2019", "12.12.2019", "27.12.2019",
 					        "03.03.2020", "17.03.2020", "31.03.2020", "15.04.2020", "28.04.2020", "12.05.2020", "26.05.2020", "09.06.2020", "23.06.2020", "07.07.2020", "21.07.2020", "04.08.2020", "18.08.2020",
 						"01.09.2020", "15.09.2020", "29.09.2020", "13.10.2020", "27.10.2020", "10.11.2020", "24.11.2020", "08.12.2020", "21.12.2020");
+		$AbholungAltpapier	= array("27.10.2020", "24.11.2020", "21.12.2020", "19.01.2021", "16.02.2021", "16.03.2021", "13.04.2021", "11.05.2021", "08.06.2021", "06.07.2021");
+		
+		
 		$heute 				= date("d.m.Y", time());
 		$morgen 			= date("d.m.Y", time() + 3600*24);
  		$uebermorgen 		= date("d.m.Y", time() + 3600*24*2);
@@ -93,6 +99,24 @@ class BSR extends IPSModule {
 			} else {
 				SetValue($this->GetIDForIdent("GruenerPunktNextDate"), 0);
 				SetValue($this->GetIDForIdent("GruenerPunktAbholungAnzeige"), "unbekannt.");
+			}
+		}
+		
+		// Nächstes Abholdatum für Altpapier aktualisieren
+		foreach ($AbholungAltpapier as &$AltpapierTermin) {
+			$dateTimestampNow	= strtotime($heute);
+			$dateTimestampAltpapierTermin	= strtotime($AltpapierTermin);
+
+			if ($dateTimestampAltpapierTermin >= $dateTimestampNow) {
+				SetValue($this->GetIDForIdent("AltpapierNextDate"), $dateTimestampAltpapierTermin);
+				SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "Am ".$AltpapierTermin);
+				if (strcmp($heute, 	 $AltpapierTermin) == 0) 	SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "Heute");
+				if (strcmp($morgen, 	 $AltpapierTermin) == 0) 	SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "Morgen");
+				if (strcmp($uebermorgen, $AltpapierTermin) == 0) 	SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "Übermorgen");
+				break;
+			} else {
+				SetValue($this->GetIDForIdent("AltpapierNextDate"), 0);
+				SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "unbekannt.");
 			}
 		}
 	}
