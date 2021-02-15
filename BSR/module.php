@@ -32,6 +32,8 @@ class BSR extends IPSModule {
 		$this->MaintainVariable("GruenerPunktAbholungAnzeige", "Grüner Punkt Abholung Anzeige", 3, "", 40, true);
 		$this->MaintainVariable("AltpapierNextDate", "Altpapier nächster Abholtermin", 1, "~UnixTimestampDate", 50, true);
 		$this->MaintainVariable("AltpapierAbholungAnzeige", "Altpapier Abholung Anzeige", 3, "", 60, true);
+		$this->MaintainVariable("BioNextDate", "Biomüll nächster Abholtermin", 1, "~UnixTimestampDate", 70, true);
+		$this->MaintainVariable("BioAbholungAnzeige", "Biomüll Abholung Anzeige", 3, "", 80, true);
 		
 
 		$this->UpdateAbholtermine();
@@ -63,13 +65,13 @@ class BSR extends IPSModule {
 					        "02.03.2021", "16.03.2021", "30.03.2021", "13.04.2021", "27.04.2021", "11.05.2021", "26.05.2021", "08.06.2021", "22.06.2021", "06.07.2021", "20.07.2021", "03.08.2021", "17.08.2021", 
 					        "31.08.2021", "14.09.2021", "28.09.2021", "12.10.2021", "26.10.2021", "09.11.2021", "23.11.2021", "07.12.2021");
 		$AbholungAltpapier	= array("27.10.2020", "24.11.2020", "21.12.2020", "19.01.2021", "16.02.2021", "16.03.2021", "13.04.2021", "11.05.2021", "08.06.2021", "06.07.2021");
-		$AbhulungBio		= array("28.12.2020", "11.01.2021", "25.01.2021", "08.02.2021", "22.02.2021", "09.03.2021", "22.03.2021", "06.04.2021", "19.04.2021", "03.05.2021", "17.05.2021", "31.05.2021", "14.06.2021",   
+		$AbholungBio		= array("28.12.2020", "11.01.2021", "25.01.2021", "08.02.2021", "22.02.2021", "09.03.2021", "22.03.2021", "06.04.2021", "19.04.2021", "03.05.2021", "17.05.2021", "31.05.2021", "14.06.2021",   
 						"28.06.2021", "12.07.2021", "26.07.2021", "09.08.2021", "23.08.2021", "06.09.2021", "20.09.2021", "04.10.2021", "18.10.2021", "01.11.2021", "15.11.2021", "29.11.2021", "13.12.2021");
 		
 		
 		$heute 				= date("d.m.Y", time());
 		$morgen 			= date("d.m.Y", time() + 3600*24);
- 		$uebermorgen 		= date("d.m.Y", time() + 3600*24*2);
+ 		$uebermorgen 			= date("d.m.Y", time() + 3600*24*2);
 
 
 		// Nächstes Abholdatum für die BSR aktualisieren
@@ -123,6 +125,24 @@ class BSR extends IPSModule {
 			} else {
 				SetValue($this->GetIDForIdent("AltpapierNextDate"), 0);
 				SetValue($this->GetIDForIdent("AltpapierAbholungAnzeige"), "unbekannt.");
+			}
+		}
+		
+		// Nächstes Abholdatum für Biomüll aktualisieren
+		foreach ($AbholungBio as &$BioTermin) {
+			$dateTimestampNow	= strtotime($heute);
+			$dateTimestampBioTermin	= strtotime($BiopapierTermin);
+
+			if ($dateTimestampBioTermin >= $dateTimestampNow) {
+				SetValue($this->GetIDForIdent("BioNextDate"), $dateTimestampBioTermin);
+				SetValue($this->GetIDForIdent("BioAbholungAnzeige"), "Am ".$BioTermin);
+				if (strcmp($heute, 	 $BioTermin) == 0) 	SetValue($this->GetIDForIdent("BioAbholungAnzeige"), "Heute");
+				if (strcmp($morgen, 	 $BioTermin) == 0) 	SetValue($this->GetIDForIdent("BioAbholungAnzeige"), "Morgen");
+				if (strcmp($uebermorgen, $BioTermin) == 0) 	SetValue($this->GetIDForIdent("BioAbholungAnzeige"), "Übermorgen");
+				break;
+			} else {
+				SetValue($this->GetIDForIdent("BioNextDate"), 0);
+				SetValue($this->GetIDForIdent("BioAbholungAnzeige"), "unbekannt.");
 			}
 		}
 	}
