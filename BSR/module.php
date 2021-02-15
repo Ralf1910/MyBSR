@@ -131,7 +131,7 @@ class BSR extends IPSModule {
 		// Nächstes Abholdatum für Biomüll aktualisieren
 		foreach ($AbholungBio as &$BioTermin) {
 			$dateTimestampNow	= strtotime($heute);
-			$dateTimestampBioTermin	= strtotime($BiopapierTermin);
+			$dateTimestampBioTermin	= strtotime($BioTermin);
 
 			if ($dateTimestampBioTermin >= $dateTimestampNow) {
 				SetValue($this->GetIDForIdent("BioNextDate"), $dateTimestampBioTermin);
