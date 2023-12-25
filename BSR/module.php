@@ -5,8 +5,7 @@
 //
 // ************************************************************
 
-class BSR extends IPSModule {
-
+class BSR extends IPSModule { 
 
 	public function Create() {
 		// Diese Zeile nicht löschen.
